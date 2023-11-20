@@ -1,3 +1,5 @@
+// /api/contacts
+
 const express = require("express");
 const router = express.Router();
 const contactsController = require("../../controllers/contacts-controllers");
@@ -8,12 +10,16 @@ const contactsSchemas = require("../../schemas/contactsSchemas");
 const {
   isMissingRequiredFields,
   isEmptyBody,
+  isValidId,
 } = require("../../middlewares/index");
 
+// Отримати всі контакти
 router.get("/", contactsController.getAll);
 
-router.get("/:contactId", contactsController.getById);
+// Отримати один контакт
+router.get("/:id", isValidId, contactsController.getById);
 
+// Додати контакт
 router.post(
   "/",
   isEmptyBody,
@@ -22,13 +28,25 @@ router.post(
   contactsController.add
 );
 
-router.delete("/:contactId", contactsController.deleteById);
+// Видалити контакт
+router.delete("/:id", isValidId, contactsController.remove);
 
+// Обновити контакт
 router.put(
-  "/:contactId",
+  "/:id",
   isEmptyBody,
+  isValidId,
   validaterBody(contactsSchemas.update),
-  contactsController.updateById
+  contactsController.update
+);
+
+// Обновити статус
+router.patch(
+  "/:id/favorite",
+  isEmptyBody,
+  isValidId,
+  validaterBody(contactsSchemas.updateStatus),
+  contactsController.update
 );
 
 module.exports = router;

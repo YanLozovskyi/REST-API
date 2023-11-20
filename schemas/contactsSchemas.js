@@ -6,6 +6,7 @@ const add = Joi.object({
     .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
     .required(),
   phone: Joi.string().required(),
+  favorite: Joi.boolean(),
 });
 
 const update = Joi.object({
@@ -15,6 +16,11 @@ const update = Joi.object({
     tlds: { allow: ["com", "net"] },
   }),
   phone: Joi.string(),
+  favorite: Joi.boolean(),
 });
 
-module.exports = { add, update };
+const updateStatus = Joi.object({
+  favorite: Joi.boolean().required(),
+});
+
+module.exports = { add, update, updateStatus };
