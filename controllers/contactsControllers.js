@@ -1,12 +1,16 @@
 const asyncHandler = require("express-async-handler");
 const contactsService = require("../services/СontactsService");
 
-class contactsController {
+class ContactsController {
+  handleError(res, statusCode, message) {
+    res.status(statusCode);
+    throw new Error(message);
+  }
+
   getAll = asyncHandler(async (req, res) => {
     const contacts = await contactsService.findAllContacts();
     if (!contacts) {
-      res.status(400);
-      throw new Error("Unable to fetch contacts");
+      this.handleError(res, 400, "Unable to fetch contacts");
     }
     res.status(200);
     res.json({ code: 200, contacts, quantity: contacts.length });
@@ -18,8 +22,7 @@ class contactsController {
     const contact = await contactsService.findOneContact(id);
 
     if (!contact) {
-      res.status(404);
-      throw new Error(`Contact with id: ${id} is not found`);
+      this.handleError(res, 404, `Contact with id: ${id} is not found`);
     }
 
     res.status(200);
@@ -30,8 +33,7 @@ class contactsController {
     const contact = await contactsService.addContact({ ...req.body });
 
     if (!contact) {
-      res.status(400);
-      throw new Error("Unable to save contact");
+      this.handleError(res, 400, "Unable to save contact");
     }
 
     res.status(201);
@@ -44,8 +46,7 @@ class contactsController {
     const contact = await contactsService.updateContact(id, req.body);
 
     if (!contact) {
-      res.status(404);
-      throw new Error(`Contact with id: ${id} is not found`);
+      this.handleError(res, 404, `Contact with id: ${id} is not found`);
     }
 
     res.status(200);
@@ -58,8 +59,7 @@ class contactsController {
     const contact = await contactsService.removeContact(id);
 
     if (!contact) {
-      res.status(404);
-      throw new Error(`Contact with id: ${id} is not found`);
+      this.handleError(res, 404, `Contact with id: ${id} is not found`);
     }
 
     res.status(200);
@@ -67,4 +67,4 @@ class contactsController {
   });
 }
 
-module.exports = new contactsController();
+module.exports = new ContactsController();
