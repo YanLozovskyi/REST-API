@@ -1,16 +1,17 @@
 const asyncHandler = require("express-async-handler");
 const contactsService = require("../services/СontactsService");
+const HttpError = require("../helpers/HttpError");
 
 class ContactsController {
-  handleError(res, statusCode, message) {
-    res.status(statusCode);
-    throw new Error(message);
-  }
-
   getAll = asyncHandler(async (req, res) => {
-    const contacts = await contactsService.findAllContacts();
+    const { _id: owner } = req.user;
+    const { page = 1, limit = 10, ...filterParams } = req.query;
+    const skip = (page - 1) * limit;
+    const filter = { owner, ...filterParams };
+    const contacts = await contactsService.findAllContacts(filter, skip, limit);
+
     if (!contacts) {
-      this.handleError(res, 400, "Unable to fetch contacts");
+      throw HttpError(400, "Unable to fetch contacts");
     }
     res.status(200);
     res.json({ code: 200, contacts, quantity: contacts.length });
@@ -18,11 +19,15 @@ class ContactsController {
 
   getById = asyncHandler(async (req, res) => {
     const { id } = req.params;
+    const { _id: owner } = req.user;
 
-    const contact = await contactsService.findOneContact(id);
+    const contact = await contactsService.findOneContact({
+      _id: id,
+      owner,
+    });
 
     if (!contact) {
-      this.handleError(res, 404, `Contact with id: ${id} is not found`);
+      throw HttpError(400, `Contact with id: ${id} is not found`);
     }
 
     res.status(200);
@@ -30,10 +35,11 @@ class ContactsController {
   });
 
   add = asyncHandler(async (req, res) => {
-    const contact = await contactsService.addContact({ ...req.body });
+    const { _id: owner } = req.user;
+    const contact = await contactsService.addContact({ ...req.body, owner });
 
     if (!contact) {
-      this.handleError(res, 400, "Unable to save contact");
+      throw HttpError(400, "Unable to save contact");
     }
 
     res.status(201);
@@ -42,24 +48,29 @@ class ContactsController {
 
   update = asyncHandler(async (req, res) => {
     const { id } = req.params;
-
-    const contact = await contactsService.updateContact(id, req.body);
-
+    const { _id: owner } = req.user;
+    const contact = await contactsService.updateContact(
+      { _id: id, owner },
+      req.body
+    );
+    console.log(contact);
     if (!contact) {
-      this.handleError(res, 404, `Contact with id: ${id} is not found`);
+      throw HttpError(404, "Not Found");
     }
-
-    res.status(200);
-    res.json({ code: 200, contact });
+    res.status(201).json(contact);
   });
 
   remove = asyncHandler(async (req, res) => {
     const { id } = req.params;
+    const { _id: owner } = req.user;
 
-    const contact = await contactsService.removeContact(id);
+    const contact = await contactsService.removeContact({
+      _id: id,
+      owner,
+    });
 
     if (!contact) {
-      this.handleError(res, 404, `Contact with id: ${id} is not found`);
+      throw HttpError(400, `Contact with id: ${id} is not found`);
     }
 
     res.status(200);

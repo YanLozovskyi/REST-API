@@ -1,14 +1,17 @@
 const contactModel = require("../models/contactModel");
 
 class ContactsService {
-  findAllContacts = async () => {
-    const contacts = await contactModel.find({});
+  findAllContacts = async (filter, skip, limit) => {
+    const contacts = await contactModel.find(filter, "-createdAt -updatedAt", {
+      skip,
+      limit,
+    });
     return contacts || null;
   };
 
-  findOneContact = async (id) => {
-    const contacts = await contactModel.findById(id);
-    return contacts || null;
+  findOneContact = async ({ _id: id, owner }) => {
+    const contact = await contactModel.findOne({ _id: id, owner });
+    return contact || null;
   };
 
   addContact = async (data) => {
@@ -16,18 +19,16 @@ class ContactsService {
     return contact || null;
   };
 
-  updateContact = async (id, data) => {
-    const contact = await contactModel.findByIdAndUpdate(
-      id,
-      { ...data },
-      { runValidators: true, new: true }
+  updateContact = async ({ _id: id, owner }, data) => {
+    const contact = await contactModel.findOneAndUpdate(
+      { _id: id, owner },
+      data
     );
-
     return contact || null;
   };
 
-  removeContact = async (id) => {
-    const contact = await contactModel.findByIdAndDelete(id);
+  removeContact = async ({ _id: id, owner }) => {
+    const contact = await contactModel.findOneAndDelete({ _id: id, owner });
     return contact || null;
   };
 }
