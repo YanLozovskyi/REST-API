@@ -5,12 +5,14 @@ const usersAuthService = require("../services/userAuthService");
 class UsersController {
   signup = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
+
     const newUser = await usersAuthService.register(email, password, req.body);
 
     res.status(201).json({
       user: {
         email: newUser.email,
         subscription: newUser.subscription,
+        avatarURL: newUser.avatarURL,
       },
     });
   });
@@ -28,6 +30,7 @@ class UsersController {
       user: {
         email: updatedUser.email,
         subscription: updatedUser.subscription,
+        avatarURL: updatedUser.avatarURL,
       },
     });
   });

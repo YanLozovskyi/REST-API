@@ -6,13 +6,19 @@ const validEmail =
 const userSignSchema = Joi.object({
   email: Joi.string().pattern(validEmail).required(),
   password: Joi.string().min(6).required(),
+  avatar: Joi.string(),
 });
 
 const userUpdateStatusSchema = Joi.object({
   subscription: Joi.string().required(),
 });
 
+const userUpdateAvatarSchema = Joi.object({
+  avatar: Joi.string().required(),
+});
+
 module.exports = {
   userSignSchema,
   userUpdateStatusSchema,
+  userUpdateAvatarSchema,
 };

@@ -3,6 +3,11 @@ const HttpError = require("../helpers/HttpError");
 const bcrypt = require("bcryptjs");
 const { JWT_SECRET } = process.env;
 const jwt = require("jsonwebtoken");
+const gravatar = require("gravatar");
+const fs = require("fs/promises");
+const path = require("path");
+
+const avatarsPath = path.resolve("public", "avatars");
 
 class UserAuthService {
   register = async (email, password, data) => {
@@ -10,10 +15,12 @@ class UserAuthService {
     if (user) {
       throw HttpError(409, "Email in use");
     }
+    const avatar = gravatar.url(email);
     const hashPassword = await bcrypt.hash(password, 10);
     const newUser = await userModel.create({
       ...data,
       password: hashPassword,
+      avatarURL: avatar,
     });
     return newUser || null;
   };

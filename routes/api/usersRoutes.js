@@ -1,16 +1,21 @@
-// /api/users
+// /users
 
 const express = require("express");
 const usersControllers = require("../../controllers/usersControllers");
 
 const { validaterBody } = require("../../decorators/index");
-const { isEmptyBody, isValidToken } = require("../../middlewares/index");
+const {
+  isEmptyBody,
+  isValidToken,
+  upload,
+} = require("../../middlewares/index");
 const usersSchemas = require("../../schemas/usersSchemas");
 
 const authRouter = express.Router();
 
 authRouter.post(
   "/register",
+  upload.single("avatar"),
   isEmptyBody,
   validaterBody(usersSchemas.userSignSchema),
   usersControllers.signup
