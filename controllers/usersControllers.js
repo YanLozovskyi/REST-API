@@ -66,6 +66,16 @@ class UsersController {
 
     res.status(201).json({ user: { email: user.email, subscription } });
   });
+
+  onChangeAvatar = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    const { path: oldPath, filename } = req.file;
+
+    const avatar = await usersAuthService.changeAvatar(_id, oldPath, filename);
+    res.status(201).json({
+      avatarURL: avatar.avatarURL,
+    });
+  });
 }
 
 module.exports = new UsersController();

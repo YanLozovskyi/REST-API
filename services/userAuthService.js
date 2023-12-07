@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const gravatar = require("gravatar");
 const fs = require("fs/promises");
 const path = require("path");
+const Jimp = require("jimp");
 
 const avatarsPath = path.resolve("public", "avatars");
 
@@ -61,6 +62,24 @@ class UserAuthService {
     const user = userModel.findByIdAndUpdate(_id, { subscription });
 
     return user || null;
+  };
+
+  changeAvatar = async (_id, oldPath, filename) => {
+    if (!_id) {
+      throw HttpError(401, "Not authirized");
+    }
+
+    const newPath = path.join(avatarsPath, filename);
+    const resizedImage = await Jimp.read(oldPath);
+    await resizedImage.resize(250, 250).writeAsync(oldPath);
+
+    await fs.rename(oldPath, newPath);
+    const newAvatarUrl = path.join("public", "avatars", filename);
+
+    const avatar = await userModel.findByIdAndUpdate(_id, {
+      avatarURL: newAvatarUrl,
+    });
+    return avatar || null;
   };
 }
 

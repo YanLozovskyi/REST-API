@@ -39,4 +39,12 @@ authRouter.patch(
   usersControllers.onChangeSubscription
 );
 
+authRouter.patch(
+  "/avatars",
+  upload.single("avatar"),
+  isValidToken,
+  // validaterBody(usersSchemas.userUpdateAvatarSchema),
+  usersControllers.onChangeAvatar
+);
+
 module.exports = authRouter;
