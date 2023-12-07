@@ -72,7 +72,7 @@ class UsersController {
     const { path: oldPath, filename } = req.file;
 
     const avatar = await usersAuthService.changeAvatar(_id, oldPath, filename);
-    res.status(201).json({
+    res.status(200).json({
       avatarURL: avatar.avatarURL,
     });
   });

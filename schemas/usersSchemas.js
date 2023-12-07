@@ -14,7 +14,7 @@ const userUpdateStatusSchema = Joi.object({
 });
 
 const userUpdateAvatarSchema = Joi.object({
-  avatar: Joi.string().required(),
+  avatar: Joi.string(),
 });
 
 module.exports = {
