@@ -76,6 +76,21 @@ class UsersController {
       avatarURL: avatar.avatarURL,
     });
   });
+
+  verifyEmail = asyncHandler(async (req, res) => {
+    const { verificationCode } = req.params;
+
+    await usersAuthService.sendVerifyEmail(verificationCode);
+
+    res.status(200).json({ message: "Successful verification" });
+  });
+
+  sendVerifyMore = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+
+    await usersAuthService.resendEmail(email);
+    res.status(200).json({ message: "Verification email sent" });
+  });
 }
 
 module.exports = new UsersController();

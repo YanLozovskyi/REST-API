@@ -1,7 +1,6 @@
 // /users
 
 const express = require("express");
-const usersControllers = require("../../controllers/usersControllers");
 
 const { validaterBody } = require("../../decorators/index");
 const {
@@ -9,6 +8,7 @@ const {
   isValidToken,
   upload,
 } = require("../../middlewares/index");
+const usersControllers = require("../../controllers/usersControllers");
 const usersSchemas = require("../../schemas/usersSchemas");
 
 const authRouter = express.Router();
@@ -19,6 +19,15 @@ authRouter.post(
   isEmptyBody,
   validaterBody(usersSchemas.userSignSchema),
   usersControllers.signup
+);
+
+authRouter.get("/verify/:verificationCode", usersControllers.verifyEmail);
+
+authRouter.post(
+  "/verify",
+  isEmptyBody,
+  validaterBody(usersSchemas.userSendVerifySchema),
+  usersControllers.sendVerifyMore
 );
 
 authRouter.post(
